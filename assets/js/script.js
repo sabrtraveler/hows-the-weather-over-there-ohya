@@ -1,83 +1,81 @@
 // assign variables for date
 
-var date = new Date()
-var month = date.getMonth()
-var year = date.getFullYear()
-var day = date.getDate()
-var completeDate = '(' + month + '/' + day + '/' + year + ')'
+var d = new Date()
+var month = d.getMonth()
+var year = d.getFullYear()
+var monthDay = d.getDate()
+var completeDate = '(' + month + '/' + monthDay + '/' + year + ')'
 
 
 // assign api key to variable
 var apiKey = '3a5dcccabb31635037afffcfa07050bc'
 
-// Retrieve the city name store in local storage or initialize it with ottawa
-var cityName = JSON.parse(localStorage.getItem("city"))
+// store city name in local storage
+var cName = JSON.parse(localStorage.getItem("city")) 
 
-// Define the query URL based on the city name
-var queryURL = 'https://api.openweathermap.org/data/2.5/forecast?q=' + cityName + '&appid=' + apiKey
+// query the url based on the city
+var qUrl = 'https://api.openweathermap.org/data/2.5/forecast?q=' + cName + '&appid=' + apiKey
 
-// Adding new cities
+// Get the cities saved in the local storage 
+// Create buttons based on the city names in local storage 
+// Put a value attribute and some styling 
 
-
-// Retrieve the cities stored in local storage or make an empty list
-// Append buttons based on the list of cities in local storage
-// Add styling and the value attribute
-var cityButtonsArray = JSON.parse(localStorage.getItem("cities")) || []
-for (var i = 0; i < cityButtonsArray.length; i++) {
-    var newCity = document.createElement("button")
-    var buttonsDiv = document.getElementById("buttons")
-    newCity.innerHTML = cityButtonsArray[i]
-    newCity.classList.add("btn", "border", "btn-block", "mt-0", "text-left", "city")
-    newCity.setAttribute("value", cityButtonsArray[i])
-    buttonsDiv.appendChild(newCity)
+var cButtons = JSON.parse(localStorage.getItem("cities")) || []
+for (var i = 0; i < cButtons.length; i++) {
+    var additionalCity = document.createElement("button")
+    var buttonsSection = document.getElementById("buttons")
+    additionalCity.innerHTML = cButtons[i]
+    additionalCity.classList.add("btn", "border", "btn-block", "mt-0", "text-left", "city")
+    additionalCity.setAttribute("value", cButtons[i])
+    buttonsSection.appendChild(additionalCity)
 }
 
-// Selector for the input element
+// store city input into variable
 var city = document.getElementById("cityInput")
 
 // Selector for the search button
 var search = document.getElementById("searchButton")
 
 
-// Add an event listener for when the user clicks the search button
-// A new button is appended to the list and the API is called to set the DOM to weather information
-// The city added is also added to list in local storage
+// create an event listener for search button
+// A button is created and weather information is displayed 
+// when additional city is added it gets put in local storage
 search.addEventListener("click", function() {
-    var newCity = document.createElement("button")
-    var buttonsDiv = document.getElementById("buttons")
-    newCity.innerHTML = city.value.toLowerCase()
-    newCity.classList.add("btn", "border", "btn-block", "mt-0", "text-left", "city")
-    newCity.setAttribute("value", city.value.toLowerCase())
-    buttonsDiv.appendChild(newCity)
-    cityButtonsArray.push(city.value.toLowerCase())
-    localStorage.setItem("cities", JSON.stringify(cityButtonsArray))
-    cityName = city.value
-    queryURL = 'https://api.openweathermap.org/data/2.5/forecast?q=' + cityName + '&appid=' + apiKey
-    localStorage.setItem('city', JSON.stringify(cityName))
-    callAPI()
+    var additionalCity = document.createElement("button")
+    var buttonsSection = document.getElementById("buttons")
+    additionalCity.innerHTML = city.value.toLowerCase()
+    additionalCity.classList.add("btn", "border", "btn-block", "mt-0", "text-left", "city")
+    additionalCity.setAttribute("value", city.value.toLowerCase())
+    buttonsSection.appendChild(additionalCity)
+    cButtons.push(city.value.toLowerCase())
+    localStorage.setItem("cities", JSON.stringify(cButtons))
+    cName = city.value
+    qUrl = 'https://api.openweathermap.org/data/2.5/forecast?q=' + cName + '&appid=' + apiKey
+    localStorage.setItem('city', JSON.stringify(cName))
+    apiData()
 })
 
 
 
-// Add Event Listener to all Buttons
+// store variables for the buttons and the city
 var buttons = document.getElementById('buttons')
-var citySelect = document.querySelectorAll('.city')
+var selectCity = document.querySelectorAll('.city')
 
 
-// Add an event listener to the city buttons to allow the user to update the page with the specified city with weather data
+// put the event listeners on all buttons
 buttons.addEventListener('click', function() {
     if (event.target.matches('.city')) {
-        cityName = event.target.value
-        queryURL = 'https://api.openweathermap.org/data/2.5/forecast?q=' + cityName + '&appid=' + apiKey
-        localStorage.setItem('city', JSON.stringify(cityName))
-        callAPI()
+        cName = event.target.value
+        qUrl = 'https://api.openweathermap.org/data/2.5/forecast?q=' + cName + '&appid=' + apiKey
+        localStorage.setItem('city', JSON.stringify(cName))
+        apiData()
     }
 })
 
 
-// Function to fetch the URL with weather data
-function callAPI() {
-    fetch(queryURL)
+// create a function to fetch weather data
+function apiData() {
+    fetch(qUrl)
         .then(function(response) {
             return response.json()
         })
@@ -85,67 +83,60 @@ function callAPI() {
 
             var dateIndex = 0
 
-            // city
-            var cityNameFetched = weatherData.city.name
+            var cityNameFetch = weatherData.city.name
 
-            // weather icon
             var weatherIcon = weatherData.list[dateIndex].weather[0].icon
 
-            // Temp in kelvins
             var temperature = (Number((weatherData.list[dateIndex].main.temp) * 9 / 5 - 459.67)).toFixed(1)
 
-            // Humidity
             var humidity = weatherData.list[dateIndex].main.humidity
 
-            // Wind Speed
             var windSpeed = Number(weatherData.list[dateIndex].wind.speed).toFixed(1)
 
-            // Latitude
             var latitude = JSON.stringify(weatherData.city.coord.lat)
 
-            // Longitude
             var longitude = JSON.stringify(weatherData.city.coord.lon)
 
-            // HTML Selectors
-            var cityNameSelector = document.getElementById("city-name")
-            var temperatureSelector = document.getElementById("temperature")
-            var humiditySelector = document.getElementById("humidity")
-            var windSpeedSelector = document.getElementById("wind-speed")
-            var weatherIconElement = document.createElement('img')
+            // set variables to HTML
+            var selectorCity = document.getElementById("city-name")
+            var selectorTemperature = document.getElementById("temperature")
+            var selectorHumidity = document.getElementById("humidity")
+            var selectorWindSpeed = document.getElementById("wind-speed")
+            var elementWeatherIcon = document.createElement('img')
 
-            // Updating Main HTML with API values
-            cityNameSelector.textContent = cityNameFetched + ' (' + month + '/' + day + '/' + year + ')'
-            temperatureSelector.textContent = 'Temperature: ' + temperature + '\u00B0 F'
-            humiditySelector.textContent = 'Humidity: ' + humidity + '%'
-            windSpeedSelector.textContent = 'Wind Speed: ' + windSpeed + ' MPH'
-            cityNameSelector.appendChild(weatherIconElement)
-            weatherIconElement.setAttribute('src', 'http://openweathermap.org/img/wn/' + weatherIcon + '.png')
+            // setting the html text content to the api data
+            selectorCity.textContent = cityNameFetch + ' (' + month + '/' + monthDay + '/' + year + ')'
+            selectorTemperature.textContent = 'Temperature: ' + temperature + '\u00B0 F'
+            selectorHumidity.textContent = 'Humidity: ' + humidity + '%'
+            selectorWindSpeed.textContent = 'Wind Speed: ' + windSpeed + ' MPH'
+            selectorCity.appendChild(elementWeatherIcon)
+            elementWeatherIcon.setAttribute('src', 'http://openweathermap.org/img/wn/' + weatherIcon + '.png')
 
-            // Retrieving UV Info
-            var UVqueryURL = 'https://api.openweathermap.org/data/2.5/uvi?appid=' + apiKey + '&lat=' + latitude + '&lon=' + longitude
-            fetch(UVqueryURL)
+            // getting the UV data
+            var uvUrl = 'https://api.openweathermap.org/data/2.5/uvi?appid=' + apiKey + '&lat=' + latitude + '&lon=' + longitude
+            fetch(uvUrl)
                 .then(function(uvResponse) {
                     return uvResponse.json()
                 })
                 .then(function(UVData) {
                     var uvIndex = UVData.value
                     var uvIndexSelector = document.getElementById("uv-index")
-                    var uvLable = document.getElementById("uv-label")
-                    uvLable.textContent = 'UVIndex:'
+                    var uvLabel = document.getElementById("uv-label")
+                    uvLabel.textContent = 'UVIndex:'
                     uvIndexSelector.textContent = uvIndex
-                        // If the uv index is greater or equal to 8 the disabled button is red
+                        // uv index >= 8 the button is red
                     if (uvIndex >= 8) {
                         uvIndexSelector.classList.add("bg-danger")
                         uvIndexSelector.classList.remove("bg-warning")
                         uvIndexSelector.classList.remove("bg-success")
                     }
-                    // If the uv index is greater or equal to 8 the disabled button is yellow
+                    // uv index < 8 & > 2 button is yellow
                     else if (uvIndex < 8 && uvIndex > 2) {
                         uvIndexSelector.classList.add("bg-warning")
                         uvIndexSelector.classList.remove("bg-success")
                         uvIndexSelector.classList.remove("bg-danger")
                     }
-                    // If the uv index is greater or equal to 8 the disabled button is green
+                    // otherwise button is green
                     else {
                         uvIndexSelector.classList.add("bg-success")
                         uvIndexSelector.classList.remove("bg-danger")
@@ -153,46 +144,44 @@ function callAPI() {
                     }
                 })
 
-            // Updating 5-Day Forecast
+            // five day forecast update
             var day = 1
 
-            // While loop used to cycle through the 5-day forecast
+            // loop through the five day forecast
             while (day < 6) {
-                // Date index used to retrieve the appropriate weather data for the next day
+                
                 dateIndex += 7
-                    // Day is updated
-                day += 1
-                    // completeDate is constructed
-                completeDate = '(' + month + '/' + day + '/' + year + ')'
+                monthDay += 1
+                completeDate = '(' + month + '/' + monthDay + '/' + year + ')'
 
-                // weather icon
+                // creating the weather icon
                 weatherIcon = weatherData.list[dateIndex].weather[0].icon
 
-                // Temp in kelvins converted to Farenheit
+                // convert temp to farrenheit 
                 temperature = (Number((weatherData.list[dateIndex].main.temp) * 9 / 5 - 459.67)).toFixed(1)
 
-                // Humidity
+                // setting the humidity
                 humidity = weatherData.list[dateIndex].main.humidity
 
-                // Select the elements in the HTML
-                var dateSelector = document.getElementById("date" + day)
-                var weatherIconSelector = document.getElementById('weather-icon' + day)
-                var tempSelector = document.getElementById("temp" + day)
-                var humidSelector = document.getElementById("humid" + day)
+                // selecting the html elements
+                var selectorDate = document.getElementById("date" + day)
+                var selectorWeatherIcon = document.getElementById('weather-icon' + day)
+                var selectorTemp = document.getElementById("temp" + day)
+                var selectorHumid = document.getElementById("humid" + day)
 
-                // Update the date, weather icon, temperature and humidity on the page
-                dateSelector.textContent = completeDate
-                weatherIconSelector.setAttribute('src', 'http://openweathermap.org/img/wn/' + weatherIcon + '.png')
-                tempSelector.textContent = "Temp: " + temperature + '\u00B0 F'
-                humidSelector.textContent = "Humidity: " + humidity + '%'
-                    // increment the day and repeat for all 5 days
+                // get data for date, weather, temp and humidity
+                selectorDate.textContent = completeDate
+                selectorWeatherIcon.setAttribute('src', 'http://openweathermap.org/img/wn/' + weatherIcon + '.png')
+                selectorTemp.textContent = "Temp: " + temperature + '\u00B0 F'
+                selectorHumid.textContent = "Humidity: " + humidity + '%'
+                
                 day += 1
 
             }
-            // Set the day back to the current date 
-            day = date.getDate()
+            // reset back to current date
+            monthDay = d.getDate()
         })
 }
 
 // Call the API to initialize with the most recent
-callAPI()
+apiData()
