@@ -10,3 +10,8 @@ body {
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
 }
+
+/* create banner gradient color */
+#banner {
+  background: linear-gradient(to right, rgb(36, 36, 153), rgb(125, 158, 177));
+}
