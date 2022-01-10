@@ -183,5 +183,4 @@ function apiData() {
         })
 }
 
-// Call the API to initialize with the most recent
 apiData()
